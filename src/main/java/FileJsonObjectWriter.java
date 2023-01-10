@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
 public class FileJsonObjectWriter implements JsonObjectWriter {
@@ -62,11 +63,15 @@ public class FileJsonObjectWriter implements JsonObjectWriter {
             addQuot();
         }
         else if (field.getType().isArray()) {
-            Object[] arr = (Object[]) field.get(object);
             addArrayStart();
-            for (int i = 0; i < arr.length; i++) {
-                addFieldValue(arr[i].getClass().getName(), arr[i]);
-                if (i < arr.length-1) {
+
+            Object arr = field.get(object);
+            int length = Array.getLength(arr);
+
+            for (int i = 0; i < length; i++) {
+                Object element = Array.get(arr, i);
+                addFieldValue(element.getClass().getName(), element);
+                if (i < length-1) {
                     addComma();
                 }
             }
