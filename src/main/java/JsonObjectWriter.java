@@ -1,3 +1,3 @@
 public interface JsonObjectWriter {
-    void writeJson(Object object) throws IllegalAccessException;
+    void writeJson(Object object, String path) throws IllegalAccessException;
 }

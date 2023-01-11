@@ -14,8 +14,8 @@ public class App {
         System.out.println(jsonString);
 
         FileJsonObjectWriter jsonWriter = FileJsonObjectWriter.newFileJsonObjectWriter();
-        jsonWriter.writeJson(player);
-
+        String path = "d:/test.json";
+        jsonWriter.writeJson(player, path);
     }
 
 }

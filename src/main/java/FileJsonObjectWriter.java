@@ -1,5 +1,10 @@
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class FileJsonObjectWriter implements JsonObjectWriter {
 
@@ -13,10 +18,10 @@ public class FileJsonObjectWriter implements JsonObjectWriter {
     }
 
     @Override
-    public void writeJson(Object object) throws IllegalAccessException {
+    public void writeJson(Object object, String path) throws IllegalAccessException {
         jsonString = new StringBuilder();
         String resultJsonString = getJsonStringFromObject(object);
-        System.out.println(resultJsonString);
+        writeJsonStringToFile(resultJsonString, path);
     }
 
     private String getJsonStringFromObject(Object object) throws IllegalAccessException {
@@ -77,6 +82,23 @@ public class FileJsonObjectWriter implements JsonObjectWriter {
             }
             addArrayEnd();
         }
+        else if (Iterable.class.isAssignableFrom(field.getType())) {
+            addArrayStart();
+
+            Collection arr = (Collection) field.get(object);
+            Iterator iter = arr.iterator();
+
+            int i = 0;
+            while (iter.hasNext()) {
+                Object element = iter.next();
+                addFieldValue(element.getClass().getName(), element);
+                if (i < arr.size()-1) {
+                    addComma();
+                }
+                i++;
+            }
+            addArrayEnd();
+        }
         else {
             fillStringBuilderFromObject(field.get(object));
         }
@@ -125,4 +147,11 @@ public class FileJsonObjectWriter implements JsonObjectWriter {
         jsonString.append(JsonMarks.ENDARRAY.getValue());
     }
 
+    private void writeJsonStringToFile(String resultJsonString, String path) {
+        try {
+            Files.write(Paths.get(path), resultJsonString.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
